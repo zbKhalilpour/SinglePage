@@ -1,0 +1,282 @@
+﻿
+@model SinglePage1.Models.VIewModels.ProductViewModel
+
+@{
+    ViewBag.Title = "Category";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+
+
+
+    <script src="~/Scripts/jquery-3.5.1.min.js"></script>
+
+    
+    @*<script src="~/Scripts/Category.js"></script>*@
+    <title>Products</title>
+</head>
+<body>
+    <div class="container-fluid">
+
+        <h2>Products</h2>
+        <hr />
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="row form-groups" id="toolBar">
+                <div class="col-sm-1"></div>
+                <div> <input class="btn btn-success col-sm-2" type="button" name="saveButton" id="btnSave" value="Save" /></div>
+                <div class="col-sm-1"></div>
+                <div> <input class="btn btn-warning col-sm-1" type="submit" name="editButton" id="btnEdit" value="Edit" /></div>
+                <div class="col-sm-1"></div>
+                <div><input class="btn btn-danger col-sm-1" type="button" name="deleteButton" id="btnDelete" value="Delete" /></div>
+                <div class="col-sm-1"></div>
+                <div> <input class="btn btn-info col-sm-1" type="button" name="refreshButton" id="btnRefresh" value="Refresh" /></div>
+                <div class="col-sm-1"></div>
+            </div>
+
+            <div class="form-horizontal">
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.Code, new { @id = "code", htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.Title, new { @id = "title", htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.UnitPrice, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.UnitPrice, new { @id = "unitPrice", htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.UnitPrice, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Countity, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.Countity, new { @id = "countity", htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Countity, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </div>
+        }
+        
+
+        <table id="productGrid" class="table" cellspacing="0" rules="all" border="1" style="border-collapse: collapse;">
+            <tr>
+                @*<th>
+            <input type="checkbox" disabled="disabled">
+        </th>*@
+                <th>
+                    @Html.DisplayNameFor(model => model.Id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Code)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UnitPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Countity)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.GetProduct())
+            {
+        <tr>
+            @*<td>
+            <input type="checkbox" value="select" >
+        </td>*@
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Countity)
+            </td>
+
+        </tr>
+            }
+
+        </table>
+
+    </div>
+
+    <script type="text/javascript" >
+        //***Save***
+        $("#btnSave").click(function () {
+            ref_ProductViewModel = {
+                Code: $("#code").val(),
+                Title: $("#title").val(),
+                UnitPrice: $("#unitPrice").val(),
+                Countity: $("#countity").val(),
+
+            };
+            alert("Code " + ref_ProductViewModel.Code);
+            $.ajax({
+                    ``
+                url: "/Products/create",
+                data: JSON.stringify(ref_ProductViewModel),
+                type: "Post",
+                contentType: "application/json;charset=utf-8",
+                DataType: "json",
+
+                success: function (result) {
+                    alert("Success :) ");
+                    //Location.reload();
+                    location.reload("#productGrid");
+                },
+
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+
+            });
+
+        })
+       
+        //****selectedrow****
+        var table = document.getElementById("productGrid"), rIndex;
+        for (var i = 0; i < table.rows.length; i++) {
+            table.rows[i].onclick = function () {
+                rIndex = this.rowIndex;
+                console.log("Index of table :" + rIndex)
+                var id = this.cells[0].innerHTML.trim();
+                console.log("id is:" + id)
+                $("#code").val(this.cells[1].innerHTML.trim());
+                $("#title").val(this.cells[2].innerHTML.trim());
+               // console.log("id is:" + $("#title").val(this.cells[2].innerHTML))
+                $("#unitPrice").val(this.cells[3].innerHTML.trim());
+                $("#countity").val(this.cells[4].innerHTML.trim());
+            }
+          
+        }
+
+        //***Edit***
+        $("#btnEdit").click(function () {
+            var ref_ProductViewModel = {};
+            ref_ProductViewModel.Id = table.rows[rIndex].cells[0].innerHTML;
+            ref_ProductViewModel.Code= $("#code").val();
+            ref_ProductViewModel.Title= $("#title").val();
+            ref_ProductViewModel.UnitPrice=$("#unitPrice").val();
+            ref_ProductViewModel.Countity = $("#countity").val();
+          
+           
+            //alert("Id is:" + ref_product.Id);
+            //alert("Code is:" + ref_product.Code);
+            //alert("Title is:" + ref_product.Title);
+            //alert("Countity is:" + ref_product.Countity);
+            //Id = table.rows[rIndex].cells[0].innerHTML;
+          
+            
+            //$.post("/Products/Edit", { ref_ProductViewModel: ref_ProductViewModel }, function (data) {
+            //    if (data != null) {
+            //        alert("Edit was done!");
+            //        location.reload("#productGrid");
+            //    }
+            //    else {
+            //        alert("Error");
+            //    }
+            //});
+              $.ajax({
+
+                url: "/Products/Edit",
+                data: JSON.stringify(ref_ProductViewModel),
+                type: "Post",
+                contentType: "application/json;charset=utf-8",
+                DataType: "json",
+
+                success: function (result) {
+                    alert("Edit was done :) ");
+                    //Location.reload();
+                    location.reload("#productGrid");
+                },
+
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+
+            });
+        })
+
+        //****Delete*****
+        $("#btnDelete").click(function () {
+            var ref_ProductViewModel = {};
+            ref_ProductViewModel.Id  = table.rows[rIndex].cells[0].innerHTML;
+            alert("id is" + ref_ProductViewModel.Id);
+
+            //$.post("/Products/Delete", { ref_ProductViewModel: ref_ProductViewModel }, function (data) {
+            //    if (data != null) {
+            //        alert("Delete was done!");
+            //        location.reload("#productGrid");
+            //    }
+            //    else {
+            //        alert("Error");
+            //    }
+            //});
+            $.ajax({
+
+                url: "/Products/Delete",
+                data: JSON.stringify(ref_ProductViewModel),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                DataType: "json",
+
+                success: function (result) {
+                    alert("Delete :) ");
+                    //Location.reload();
+                    location.reload("#productGrid");
+                },
+
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+
+            });
+           
+        })
+
+        //***Refresh***
+        $("#btnRefresh").click(function () {
+
+            location.reload("#productGrid");
+        })
+    </script>
+
+</body>
+</html>
+
